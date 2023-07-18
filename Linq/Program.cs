@@ -16,8 +16,9 @@ namespace Linq
             //GetData(googleApps);
             //ProjectData(googleApps);
             //DivideData(googleApps);
-            OrderData(googleApps);
-
+            //OrderData(googleApps);
+            //GroupData(googleApps);
+            GroupDataOperations(googleApps);
 
         }
 
@@ -101,8 +102,55 @@ namespace Linq
 
             Display(sortedResults);
 
+        }
 
+        // grupowanie danych LINQ
+        static void GroupData(IEnumerable<GoogleApp> googleApps)
+        {
+            var categoryGroup = googleApps.GroupBy(app => app.Category);
 
+            // grupowanie po konkretnej kategorii
+
+            //var artAndDesignGroup = categoryGroup.First(e => e.Key == Category.ART_AND_DESIGN);
+
+            //var apps = artAndDesignGroup.Select(app => app); lub var apps = artAndDesignGroup.toList();
+
+            // Display(apps)
+
+            foreach (var group in categoryGroup) // grupowanie po każdej kategorii
+            {
+                var apps = group.ToList();
+
+                Console.WriteLine($"Displaying elements for a group {group.Key}");
+
+                Display(apps);
+            }
+        }
+
+        static void GroupDataOperations(IEnumerable<GoogleApp> googleApps)
+        {
+            var categoryGroup = googleApps
+                .GroupBy(app => app.Category)
+                .Where(g => g.Min(g => g.Reviews) >= 10);
+
+            foreach (var group in categoryGroup)
+            {
+                var averageReviews = group.Average(g => g.Reviews);
+                var minReviews = group.Min(g => g.Reviews);
+                var maxReviews = group.Max(g => g.Reviews);
+                var reviewsCount = group.Sum(g => g.Reviews);
+
+                // czy wszystkie app w grupie mają rating > 3.0
+                var allAppsHaveRatingOfThree = group.All(g => g.Rating > 3.0);
+
+                Console.WriteLine($"Group: {group.Key}");
+                Console.WriteLine($"averageReviews: {averageReviews}");
+                Console.WriteLine($"minReviews: {minReviews}");
+                Console.WriteLine($"maxReviews: {maxReviews}");
+                Console.WriteLine($"reviewsCount: {reviewsCount}");
+                Console.WriteLine();
+
+            }
         }
 
         static void Display(IEnumerable<GoogleApp> googleApps)
